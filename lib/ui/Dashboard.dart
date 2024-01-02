@@ -8,8 +8,10 @@ import 'package:expandable/expandable.dart';
 import 'package:http/http.dart' as http;
 import 'package:crm_flutter/ui/DailyData.dart';
 import 'package:crm_flutter/ui/LoginScreen.dart';
-import 'package:crm_flutter/Model/User.dart';
 import 'package:flutter/material.dart';
+import '../Api/Common.dart';
+import '../Model/ItemList.dart';
+import '../Model/OrderList.dart';
 
 class Dashboard extends StatefulWidget {
 
@@ -33,13 +35,18 @@ class DashBoardState extends State<Dashboard> {
     bool admin_visiblity = false;
     bool delivery_boy_visiblity = false;
     final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+    String empid = "";
     List<StaggeredTile> _cardTile = <StaggeredTile>[
       StaggeredTile.count(2, 1.4),
       StaggeredTile.count(2, 1.4),
       StaggeredTile.count(2, 1.4),
       StaggeredTile.count(2, 1.4),
     ];
+    Future<List<OrderList>>? furturedist;
+    List<OrderList> orderList = [];
+    List<ItemList> item_list = [];
+    int total =0 ,pending =0,delivered=0,cancel =0 ;
+    bool _isLoading= true;
 
     Future<bool> _onBackPressed() async{
 
@@ -106,21 +113,142 @@ class DashBoardState extends State<Dashboard> {
     }
 
     @override
-    void didChangeDependencies() {
-
-      // progressDialog = ArsProgressDialog(
-      //     context,
-      //     blur: 2,
-      //     backgroundColor: Color(0x33000000),
-      //     animationDuration: Duration(milliseconds: 500));
-
-    }
-
-    @override
     void initState() {
       super.initState();
+      getuserdata(context);
       getuser();
-      fetchPost();
+    }
+
+    Future<List<OrderList>> getdeliverydata(String empid,context) async {
+
+      try{
+
+        Map<String, String> headers = {
+          'Content-Type': 'application/json',
+        };
+
+        var response = await http.post(
+            Uri.parse('${Common.IP_URL}Customerdetails?userIds=$empid'),
+            headers: headers);
+
+        final list = jsonDecode(response.body);
+
+        orderList = list.map<OrderList>((m) => OrderList.fromJson(Map<String, dynamic>.from(m))).toList();
+
+        item_list = list.map<ItemList>((m) => ItemList.fromJson(Map<String, dynamic>.from(m))).toList();
+
+        try{
+
+          for(int i=0;i<orderList.length;i++){
+
+            for(int j=0;j<orderList[i].itemList!.length;j++) {
+
+              setState(() {
+
+                cancel = orderList[i].itemList![j].active == "-1"? ++cancel:cancel;
+                pending = orderList[i].itemList![j].active == "1"? ++pending:pending;
+                delivered = orderList[i].itemList![j].active == "2"? ++delivered:delivered;
+
+                _isLoading = false ;
+
+              });
+
+            }
+
+          }
+
+        }catch(e){
+          print("itemlist $e");
+        }
+
+      }catch(e){
+        print("itemlistt $e");
+      }
+
+      //  for (int i = 0; i < orderList.length; i++) {
+      //    for (int j = 0;j < orderList[i].itemList!.length;j++) {
+      //     if (orderList[i].itemList![j].active == "Pending"){
+      //        var contain = order_list.where((element) => element.custName == orderList.custName);
+      // //       if(contain.isEmpty){
+      //          if(mounted){
+      //
+      //            setState(() {
+      //
+      //              order_list.add(OrderList(id: orderList.id,
+      //                   custMobile: orderList.custMobile,
+      //                   custName: orderList.custName,
+      //                   zoneId: orderList.zoneId,
+      //                  zoneName: orderList.zoneName,
+      //                  areaId: orderList.areaId,
+      //                  areaName: orderList.areaName,
+      //                   stateId: orderList.stateId,
+      //                  stateName: orderList.stateName,
+      //                   landmark: orderList.landmark,
+      //                   address: orderList.address,
+      //                   pincode: orderList.pincode,
+      //                   totalPrice: orderList.totalPrice,
+      //                   totalQty: orderList.totalQty,
+      //                   paymentMode: orderList.paymentMode,
+      //                   paymentRemark: orderList.paymentRemark,
+      //                   paymentNumber: orderList.paymentNumber,
+      //                   remark: orderList.remark,
+      //                   callerId: orderList.callerId,
+      //                   deliveryAssignId: orderList.deliveryAssignId,
+      //                   deliveryAssignName: orderList.deliveryAssignName,
+      //                   deliveryAssignDate: orderList.deliveryAssignDate,
+      //                   callerName: orderList.callerName,
+      //                   source: orderList.source,
+      //                   insertedDate: orderList.insertedDate,
+      //                   itemCoupon: orderList.itemCoupon,
+      //                   itemList: orderList.itemList![i]));
+      //             });
+      //
+      //           }
+      //
+      //         }else{
+      //
+      //          }
+      //        }
+      //
+      //     }
+      //   }
+
+      // if (order_list.length == 0) {
+      //
+      //   Fluttertoast.showToast(
+      //       msg: "Sorry No Data",
+      //       toastLength: Toast.LENGTH_SHORT,
+      //       gravity: ToastGravity.BOTTOM,
+      //       timeInSecForIosWeb: 1,
+      //       backgroundColor: Colors.black,
+      //       textColor: Colors.white,
+      //       fontSize: 16.0);
+      //   // Navigator.pushReplacement(
+      //   //     context, MaterialPageRoute(builder: (context) =>Dashboard()));
+      //
+      // }
+
+      // for (int i = 0; i < order_list.length; i++) {
+      //
+      //  // for (int j = 0; j < order_list[i].itemList[i].; j++) {
+      //     // if ( order_list[i].itemDetails[j].active == "Pending") {
+      //    // print("$i $j");
+      //     print( order_list[i].custName! +"" +order_list[i].itemList!.itemName +"" +order_list[i].itemList!.active);
+      //   //  }
+      //   // }
+      // }
+      return orderList;
+    }
+
+    getuserdata(BuildContext context) async {
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      setState(() {
+        empid = prefs.getInt('empid').toString();
+      });
+
+      furturedist = getdeliverydata(empid,context);
+
     }
 
     @override
@@ -133,97 +261,162 @@ class DashBoardState extends State<Dashboard> {
             body: Container(
               child: Column(
                 children: [
-                  Container(
-                      color: Colors.lightBlue[900],
-                      width: MediaQuery.of(context).size.width,
-                      child: Column(
-                        children: [
 
-                          Container(
-                              color: Colors.lightBlue[900],
-                              margin: EdgeInsets.only(left: 15, top: 40),
-                              child: Row(children: [
-                                Align(
-                                    alignment: Alignment.centerLeft,
-                                    child: InkWell(
-                                      onTap: () {
-                                        _scaffoldKey.currentState!.openDrawer();
-                                      },
-                                      child: Image.asset(
-                                        'assets/Images/menu.png',
-                                        width: 25,
-                                        height: 25,
-                                      ),
-                                    )),
-                                Expanded(
-                                    child: Align(
-                                      alignment: Alignment.center,
-                                      child: Text(
-                                        "Dashboard",
-                                        style:
-                                        TextStyle(color: Colors.white, fontSize: 20),
-                                      ),
-                                    ))
-                              ])),
-                          Container(
-                              margin: EdgeInsets.only(left: 15, top: 30, bottom: 10),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  "Total Sale :20",
-                                  style: TextStyle(color: Colors.white, fontSize: 20),
-                                ),
-                              )
-                          ),
-                          Container(
-                              padding: EdgeInsets.only(top: 10),
-                              width: double.infinity,
-                              margin: EdgeInsets.only(top: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                    topLeft: Radius.circular(20.0),
-                                    topRight: Radius.circular(20.0)),
-                              ),
-                              child: Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  child: Column(
-                                    children: [
-                                      Align(
-                                          alignment: Alignment.center,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(left: 10.0),
-                                            child: Text(
-                                              "Hello $user",
-                                              style: TextStyle(
-                                                  color: Colors.lightBlue.shade900,
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 21),
-                                            ),
-                                          )),
-                                      SizedBox(
-                                        height: 500,
-                                        child: StaggeredGridView.count(
-                                          crossAxisCount: 4,
-                                          staggeredTiles: _cardTile,
-                                          children: _listTile,
-                                          mainAxisSpacing: 4.0,
-                                          crossAxisSpacing: 4.0,
+                  Container(
+                    child: _isLoading?
+                    CircularProgressIndicator():Container(
+                        color: Colors.lightBlue[900],
+                        width: MediaQuery.of(context).size.width,
+                        child: Column(
+                          children: [
+
+                            Container(
+                                color: Colors.lightBlue[900],
+                                margin: EdgeInsets.only(left: 15, top: 40),
+                                child: Row(children: [
+                                  Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: InkWell(
+                                        onTap: () {
+                                          _scaffoldKey.currentState!.openDrawer();
+                                        },
+                                        child: Image.asset(
+                                          'assets/Images/menu.png',
+                                          width: 25,
+                                          height: 25,
                                         ),
-                                      ),
-                                    ],
-                                  ))),
+                                      )),
+                                  Expanded(
+                                      child: Align(
+                                        alignment: Alignment.center,
+                                        child: Text(
+                                          "Dashboard",
+                                          style:
+                                          TextStyle(color: Colors.white, fontSize: 20),
+                                        ),
+                                      ))
+                                 ]
+                               )
+                            ),
+
+                            Container(
+                                padding: EdgeInsets.only(top: 10),
+                                width: double.infinity,
+                                margin: EdgeInsets.only(top: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20.0),
+                                      topRight: Radius.circular(20.0)),
+                                ),
+                                child: Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    child: Column(
+                                      children: [
+
+                                        Align(
+                                            alignment: Alignment.center,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(left: 10.0),
+                                              child: Text(
+                                                "Hello $user",
+                                                style: TextStyle(
+                                                    color: Colors.lightBlue.shade900,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 21),
+                                              ),
+                                           )
+                                        ),
+
+                                        Padding(
+                                          padding: EdgeInsets.only(left: 10,top:10,right: 10),
+                                          child: SizedBox(
+                                              width: double.infinity,
+                                              height: 150,
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                  color: Color(0xffdde6f8),
+                                                  borderRadius: BorderRadius.all(Radius.circular(15.0)),
+                                                ),
+                                                child: Column(
+                                                  mainAxisAlignment: MainAxisAlignment.center,
+                                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                                  children: [
+
+                                                    Row(
+                                                      children: [
+
+                                                        Expanded(
+                                                          child:Column(
+                                                            children: [
+                                                              Text("Today's Target",style: TextStyle( color: Colors.blue.shade900,fontWeight: FontWeight.bold)),
+                                                              Text("${orderList.length}"),
+                                                            ],
+                                                          ),
+                                                        ),
+
+                                                        Expanded(
+                                                          child:  Column(
+                                                            children: [
+                                                              Text("Achieved ",style: TextStyle( color: Colors.lightBlue.shade900,fontWeight: FontWeight.bold)),
+                                                              Text("$delivered"),
+                                                            ],
+                                                          ),
+                                                        )
+
+                                                      ],
+                                                    ),
+
+                                                    SizedBox(height: 10,),
+
+                                                    Row(
+                                                      children: [
+
+                                                        Expanded(
+                                                          child:Column(
+                                                            children: [
+                                                              Text("Pending ",style: TextStyle( color: Colors.lightBlue.shade900,fontWeight: FontWeight.bold)),
+                                                              Text("$pending"),
+                                                            ],
+                                                          ),
+                                                        ),
+
+                                                        Expanded(
+                                                          child:  Column(
+                                                            children: [
+                                                              Text("Cancel ",style: TextStyle( color: Colors.lightBlue.shade900,fontWeight: FontWeight.bold)),
+                                                              Text("$cancel"),
+                                                            ],
+                                                          ),
+                                                        )
+
+                                                      ],
+                                                    )
+
+                                                  ],
+                                                ),
+                                              )
+                                          ),
+                                        )
+
+                                      ],
+                                    )
+                                )
+                            ),
 
                           ],
-                        )
-                      )
-                   ],
-                ),
-             ),
+                       )
+                    ),
+                  )
+
+                 ],
+              ),
+            ),
             drawer: Drawer(
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: [
+
                   DrawerHeader(
                       decoration: BoxDecoration(
                         color:Color(0xff18325e),
@@ -234,9 +427,9 @@ class DashBoardState extends State<Dashboard> {
                             children: [
                               Padding(padding: EdgeInsets.only(top: 25.0)),
                               Image.asset('assets/Images/ic_logo_round.png',
-                                  width: 90, height: 90),
+                                  width: 90, height: 60),
                               Text(
-                                'Welcome to Jivo',
+                                'Welcome',
                                 style: TextStyle(color: Colors.white),
                               ),
                             ],
@@ -244,6 +437,8 @@ class DashBoardState extends State<Dashboard> {
                       )
                   ),
                   ListTile(
+                    leading: Image.asset(
+                        'assets/Images/home.png', height: 25),
                     title: Text(
                       'Dashboard',
                       style: TextStyle(color: Color(0xff18325e), fontSize: 18),
@@ -251,13 +446,14 @@ class DashBoardState extends State<Dashboard> {
 
                   ),
                   titlelist(),
-
                   ListTile(
+                    leading: Image.asset(
+                        'assets/Images/home.png', height: 25),
                     title: Text(
                       'Delivery Details',
                       style: TextStyle(color: Color(0xff18325e), fontSize: 18),
-                    ),
-                    onTap: () {
+                   ),
+                   onTap: () {
                       Navigator.pop(context);
                       Navigator.of(context).push(_createRoute());
                       // Navigator.push(
@@ -266,9 +462,10 @@ class DashBoardState extends State<Dashboard> {
                       //       builder: (context) => DeliveryData()),
                       // );
                     },
-                  ),
+                   ),
                   ListTile(
-                    // leading: Icon(Icons.lock,color: Color(0xff1e8325e),),
+                    leading: Image.asset(
+                        'assets/Images/home.png', height: 25),
                     title: Text(
                       'Logout',
                       style: TextStyle(color: Color(0xff18325e), fontSize: 18),
@@ -278,6 +475,7 @@ class DashBoardState extends State<Dashboard> {
                       logout();
                     },
                   ),
+
                 ],
               ),
             ),
@@ -360,61 +558,6 @@ class DashBoardState extends State<Dashboard> {
       print(prefs.clear());
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) =>LoginScreen()));
-    }
-
-    Future fetchPost() async {
-
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-
-      Map<String, String> headers = {
-        'Content-Type': 'application/json',
-      };
-
-      var response = await http.get(Uri.parse('http://164.52.200.38:90/DeliveryPanel/Login?Username=${prefs.getString('Name')}&Password=${prefs.getString('Password')}'),headers: headers);
-
-      User user = User.fromJson(json.decode(response.body));
-      final data = json.decode(response.body);
-
-      if (user.id > 0) {
-
-           // var menulist = jsonDecode(response.body)['menu_list'] as List;
-           //
-           // tags= menulist.map((tagJson) => MenuList.fromJson(tagJson)).toList();
-           //
-           // for(int i=0;i<tags.length;i++){
-           //
-           //   if(tags[i].parentID==0){
-           //
-           //     setState(() {
-           //       menu_name.add(tags[i].nodeName);
-           //       menu_id.add(tags[i].nodeID);
-           //     });
-           //
-           //     print(tags[i].nodeName);
-           //
-           //   }else{
-           //
-           //     setState(() {
-           //       sub_menu.add(tags[i].nodeName);
-           //       parent_id.add(tags[i].parentID);
-           //     });
-           //   }
-           //
-           // }
-
-      }else {
-        throw throw Exception('Failed to load data');
-        //    Fluttertoast.showToast(
-        //        msg: "Please check your credentials",
-        //        toastLength: Toast.LENGTH_SHORT,
-        //        gravity: ToastGravity.BOTTOM,
-        //        timeInSecForIosWeb: 1,
-        //        backgroundColor: Colors.black,
-        //        textColor: Colors.white,
-        //        fontSize: 16.0);
-        //
-      }
-
     }
 
 }

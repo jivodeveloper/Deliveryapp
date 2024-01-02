@@ -1,4 +1,3 @@
-import 'package:checkbox_grouped/checkbox_grouped.dart';
 import 'package:flutter/material.dart';
 
 class PaymentDetails extends StatefulWidget{
@@ -11,7 +10,7 @@ class PaymentDetails extends StatefulWidget{
 }
 
 class PaymentDetailsState extends State<PaymentDetails>{
- // SimpleGroupedCheckbox groupconroller = new SimpleGroupedCheckbox(controller)
+
   final _formKey = GlobalKey<FormState>();
   TextEditingController username = TextEditingController();
   TextEditingController refernce_Id = TextEditingController();
@@ -19,7 +18,7 @@ class PaymentDetailsState extends State<PaymentDetails>{
 
   @override
   Widget build(BuildContext context) {
-    var controller;
+
     return Scaffold(
         appBar: AppBar(
             backgroundColor: Colors.lightBlue.shade900,
@@ -29,6 +28,7 @@ class PaymentDetailsState extends State<PaymentDetails>{
             key: _formKey,
             child: Column(
               children: [
+
                 Container(
                     margin: EdgeInsets.only(left: 10, top: 25,right:10),
                     child: Column(
@@ -56,6 +56,7 @@ class PaymentDetailsState extends State<PaymentDetails>{
                       ],
                     )
                 ),
+
                 Container(
                     margin: EdgeInsets.only(left: 10, top: 25,right:10),
                     child: Column(
@@ -83,6 +84,7 @@ class PaymentDetailsState extends State<PaymentDetails>{
                         )
                       ],
                     )),
+
                 Container(
                     margin: EdgeInsets.only(left: 10, top: 25,right:10),
                     child: Column(
@@ -111,6 +113,7 @@ class PaymentDetailsState extends State<PaymentDetails>{
                       ],
                     )
                 ),
+
                 // Container(
                 //   width: MediaQuery.of(context).size.width * 0.5,
                 //     height: double.infinity,
@@ -127,13 +130,16 @@ class PaymentDetailsState extends State<PaymentDetails>{
                 //     checkFirstElement: false,
                 //     ),
                 //   ),
-                new GestureDetector(
-                    onTap: () {
-                      if (_formKey.currentState!.validate()) {
-                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Processing Data')),);
 
+                GestureDetector(
+
+                    onTap: () {
+
+                      if (_formKey.currentState!.validate()) {
+                        // ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Processing Data')),)
                       }
                     },
+
                     child: new Container(
                       margin: EdgeInsets.only(left: 10, top: 35),
                       width: double.infinity,
@@ -150,11 +156,14 @@ class PaymentDetailsState extends State<PaymentDetails>{
                           )
                       ),
                     )
+
                 )
+
               ],
             )
         )
     );
+
   }
 
 }

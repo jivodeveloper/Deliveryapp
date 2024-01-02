@@ -4,6 +4,7 @@ class ItemList {
   int? itemQty;
   int? uomValue;
   int? itemRate;
+  int? odrItemId;
   int? itemTotalAmount;
   String? coupon;
   String? deliveryRemark;
@@ -24,6 +25,7 @@ class ItemList {
         this.itemQty,
         this.uomValue,
         this.itemRate,
+        this.odrItemId,
         this.itemTotalAmount,
         this.coupon,
         this.deliveryRemark,
@@ -44,6 +46,7 @@ class ItemList {
     itemQty = json['itemQty'];
     uomValue = json['uomValue'];
     itemRate = json['itemRate'];
+    odrItemId = json['odrItemId'];
     itemTotalAmount = json['itemTotalAmount'];
     coupon = json['coupon'];
     deliveryRemark = json['deliveryRemark'];
@@ -66,6 +69,7 @@ class ItemList {
     data['itemQty'] = this.itemQty;
     data['uomValue'] = this.uomValue;
     data['itemRate'] = this.itemRate;
+    data['odrItemId'] = this.odrItemId;
     data['itemTotalAmount'] = this.itemTotalAmount;
     data['coupon'] = this.coupon;
     data['deliveryRemark'] = this.deliveryRemark;

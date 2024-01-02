@@ -67,6 +67,7 @@ class Layoutone extends StatelessWidget {
         ));
   }
 
+
 }
 
 class Layouttwo extends StatelessWidget {
@@ -211,38 +212,38 @@ class Layoutfour extends StatelessWidget {
               ),
             ),
 
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    children: [
-                      Text("Order Status",style: TextStyle(color: Colors.white, fontSize: 15)),
-                      Text("123",style: TextStyle(color: Colors.white, fontSize: 15)),
-                    ],
-                  ),
-                ),
-                Expanded(
-                    child: Column(
-                  children: [
-                    Text("Delivery Order",style: TextStyle(color: Colors.white, fontSize: 15)),
-                    Text("431",style: TextStyle(color: Colors.white, fontSize: 15)),
-                  ],
-                ))
-              ],
-            ),
-
-            Container(
-              child: Column(
-                children: [
-                  Align(
-                      alignment: Alignment.centerLeft,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 10, top: 10),
-                        child: Text("Order Status",style:TextStyle(color: Colors.white, fontSize: 15)),
-                      ))
-                ],
-              ),
-            )
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: Column(
+            //         children: [
+            //           Text("Order Status",style: TextStyle(color: Colors.white, fontSize: 15)),
+            //           Text("123",style: TextStyle(color: Colors.white, fontSize: 15)),
+            //         ],
+            //       ),
+            //     ),
+            //     Expanded(
+            //         child: Column(
+            //       children: [
+            //         Text("Delivery Order",style: TextStyle(color: Colors.white, fontSize: 15)),
+            //         Text("431",style: TextStyle(color: Colors.white, fontSize: 15)),
+            //       ],
+            //     ))
+            //   ],
+            // ),
+            //
+            // Container(
+            //   child: Column(
+            //     children: [
+            //       Align(
+            //           alignment: Alignment.centerLeft,
+            //           child: Padding(
+            //             padding: EdgeInsets.only(left: 10, top: 10),
+            //             child: Text("Order Status",style:TextStyle(color: Colors.white, fontSize: 15)),
+            //           ))
+            //     ],
+            //   ),
+            // )
 
           ],
      ));

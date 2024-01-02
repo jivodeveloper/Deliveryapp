@@ -395,7 +395,7 @@ class LoginScreenState extends State<LoginScreen> {
         prefs.setString('Name', username);
         prefs.setString('Password', password);
         prefs.setInt('empid', user.id);
-        print("${user.id.toString()}");
+       // print("${user.id.toString()}");
         Fluttertoast.showToast(
             msg: "Logged In Successfully",
             toastLength: Toast.LENGTH_SHORT,
@@ -439,7 +439,6 @@ class LoginScreenState extends State<LoginScreen> {
           textColor: Colors.white,
           fontSize: 16.0);
     }
-
 
   }
 
@@ -505,7 +504,7 @@ class LoginScreenState extends State<LoginScreen> {
 
   Route _createRoute() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, secondaryAnimation) => DeliveryData(),
+      pageBuilder: (context, animation, secondaryAnimation) => Dashboard(),
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         const begin = Offset(0.0, 1.0);
         const end = Offset.zero;

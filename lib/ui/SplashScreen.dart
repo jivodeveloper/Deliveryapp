@@ -75,7 +75,7 @@ class SplashScreenState extends State<SplashScreen> {
       Timer(
           Duration(seconds: 3),
               () => Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => DeliveryData())));
+              context, MaterialPageRoute(builder: (context) => Dashboard())));
 
     }else{
 
@@ -86,6 +86,7 @@ class SplashScreenState extends State<SplashScreen> {
     }
 
   }
+
   Route _createRoute() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, secondaryAnimation) =>  LoginScreen(),
@@ -103,6 +104,7 @@ class SplashScreenState extends State<SplashScreen> {
       },
     );
   }
+
 }
 
 
